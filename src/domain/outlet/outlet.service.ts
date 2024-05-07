@@ -1,26 +1,26 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { Product } from '@prisma/client';
+import { Outlet } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { CreateUpdateProductDto } from './dto/create-update-product.dto';
+import { CreateUpdateOutletDto } from './dto/create-update-outlet.dto';
 
 @Injectable()
-export class ProductService {
+export class OutletService {
   constructor(
     private prisma: PrismaService,
   ) { }
 
-  async create(dto: CreateUpdateProductDto): Promise<Product> {
+  async create(dto: CreateUpdateOutletDto): Promise<Outlet> {
     try {
-      const product = await this.prisma.product.create({
+      const user = await this.prisma.outlet.create({
         data: dto,
       });
-      return product;
+      return user;
     } catch (error) {
       // Handle Prisma-specific errors (e.g., unique constraint violations)
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') { // Unique constraint violation
-          throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+          throw new HttpException('Outlet already exists', HttpStatus.BAD_REQUEST);
         } else {
           throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -30,22 +30,22 @@ export class ProductService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(): Promise<Outlet[]> {
     try {
-      const products = await this.prisma.product.findMany();
-      return products;
+      const users = await this.prisma.outlet.findMany();
+      return users;
     } catch (error) {
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async findOne(id: number): Promise<Product | null> {
+  async findOne(id: number): Promise<Outlet | null> {
     try {
-      const product = await this.prisma.product.findUnique({
+      const user = await this.prisma.outlet.findUnique({
         where: { id },
       });
 
-      return product;
+      return user;
     } catch (error) {
       // Handle potential Prisma errors here (e.g., record not found)
       if (error instanceof PrismaClientKnownRequestError) {
@@ -59,18 +59,18 @@ export class ProductService {
     }
   }
 
-  async update(id: number, updateProductDto: CreateUpdateProductDto): Promise<Product> {
+  async update(id: number, updateOutletDto: CreateUpdateOutletDto): Promise<Outlet> {
     try {
-      const product = await this.prisma.product.update({
+      const user = await this.prisma.outlet.update({
         where: { id },
-        data: updateProductDto,
+        data: updateOutletDto,
       });
-      return product;
+      return user;
     } catch (error) {
       // Handle Prisma-specific errors (similar to create)
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') { // Unique constraint violation
-          throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+          throw new HttpException('Outlet already exists', HttpStatus.BAD_REQUEST);
         } else {
           throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -81,7 +81,7 @@ export class ProductService {
 
   async remove(id: number): Promise<void> {
     try {
-      await this.prisma.product.delete({ where: { id } });
+      await this.prisma.outlet.delete({ where: { id } });
     } catch (error) {
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
