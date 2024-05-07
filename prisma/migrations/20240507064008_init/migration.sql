@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('ADMIN', 'EMPLOYEE');
 
+-- CreateEnum
+CREATE TYPE "QuantityUnit" AS ENUM ('Pcs', 'Liter', 'MiliLiter', 'Box', 'Cup', 'Bottle');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -25,31 +28,21 @@ CREATE TABLE "Outlet" (
 -- CreateTable
 CREATE TABLE "Product" (
     "id" SERIAL NOT NULL,
+    "productCode" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
-    "quantity" INTEGER NOT NULL,
+    "pricePerMiliLiter" DOUBLE PRECISION NOT NULL,
+    "quantity" DOUBLE PRECISION NOT NULL,
+    "quantityUnit" "QuantityUnit" NOT NULL,
     "description" TEXT NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ProductCode" (
-    "id" SERIAL NOT NULL,
-    "name" VARCHAR(100) NOT NULL,
-    "productId" INTEGER NOT NULL,
-
-    CONSTRAINT "ProductCode_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ProductCode_productId_key" ON "ProductCode"("productId");
+CREATE UNIQUE INDEX "Product_productCode_key" ON "Product"("productCode");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_outletId_fkey" FOREIGN KEY ("outletId") REFERENCES "Outlet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ProductCode" ADD CONSTRAINT "ProductCode_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
