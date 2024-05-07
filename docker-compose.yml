@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  dev-db:
+    image: postgres:16
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: inkripsi
+      POSTGRES_DB: konsinyasi_distributor
+networks:
+  localnetwork:

@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Section =========================================================================
+// 1 Outlet can have many User (1 to many)
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(100)
+  email    String @unique
+  password String @db.VarChar(100)
+  role     Role
+
+  outlet   Outlet @relation(fields: [outletId], references: [id])
+  outletId Int
+}
+
+model Outlet {
+  id      Int    @id @default(autoincrement())
+  name    String @db.VarChar(100)
+  address String
+
+  user User[]
+}
+
+// Product Section =========================================================================
+// 1 Product can only have 1 ProductCode (1 to 1)
+
+model Product {
+  id          Int    @id @default(autoincrement())
+  name        String
+  price       Float
+  quantity    Int
+  description String
+
+  productCode ProductCode?
+}
+
+model ProductCode {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int     @unique
+}
+
+// Transactions Section =========================================================================
