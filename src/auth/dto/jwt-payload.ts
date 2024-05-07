@@ -1,0 +1,1 @@
+export interface JwtPayloadType { userId: number, token: string }

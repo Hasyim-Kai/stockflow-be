@@ -1,41 +1,42 @@
-import { Injectable, Dependencies, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Dependencies, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { UserService } from '@/domain/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '@/prisma/prisma.service';
+import { compare } from 'bcrypt';
+import { JwtPayloadType } from './dto/jwt-payload';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UserService,
     private jwtService: JwtService,
     private config: ConfigService,
+    private prisma: PrismaService,
   ) { }
 
-  // async validateUser(username, pass) {
-  //   const user = await this.userService.findOne(username);
-  //   if (user && user.password === pass) {
-  //     const { password, ...result } = user;
-  //     return result;
-  //   }
-  //   return null;
-  // }
+  async signIn(email: string, password: string,): Promise<JwtPayloadType> {
+    try {
+      const user = await this.prisma.user.findFirst({ where: { email } });
+      if (!user) {
+        throw new NotFoundException(`User with email ${email} not found`);
+      }
 
-  async signIn(
-    username: string,
-    pass: string,
-  ): Promise<{ userId: number, access_token: string }> {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+      const isPasswordCorrect = await compare(password, user.password);
+      if (!isPasswordCorrect) {
+        throw new UnauthorizedException(`Wrong password`);
+      }
+
+      const payload = { userId: user.id, email: user.email };
+      return {
+        userId: user.id,
+        token: await this.jwtService.signAsync(payload),
+      };
+    } catch (error) {
+      throw error;
     }
-    const payload = { sub: user.userId, username: user.username };
-    return {
-      userId: user.userId,
-      access_token: await this.jwtService.signAsync(payload),
-    };
   }
 
-  async verifyJwt(token: string): Promise<any> {
+  async verifyJwt(token: string): Promise<JwtPayloadType> {
     try {
       const decoded = await this.jwtService.verify(token, {
         secret: this.config.get<string>('JWT_SECRET'), // Replace with your secret key environment variable
