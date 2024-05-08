@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGua
 import { UserService } from './user.service';
 import { CreateUpdateUserDto } from './dto/create-update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
+import { CurrentUser } from '@/decorator/current-user';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -17,6 +18,11 @@ export class UserController {
   findAll() {
     return this.userService.findAll();
   }
+
+  // @Get(`current`)
+  // findCurrent(@CurrentUser() user) {
+  //   return user;
+  // }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: string) {
