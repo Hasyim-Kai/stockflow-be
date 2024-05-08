@@ -8,6 +8,7 @@ async function main() {
     prisma.$transaction(async (tx) => {
         await tx.user.deleteMany({});
         await tx.outlet.deleteMany({});
+        await tx.product.deleteMany({});
 
         // Seed an outlet associated with the first user (ADMIN)
         const outlet = await tx.outlet.create({
@@ -21,6 +22,7 @@ async function main() {
         const user = await tx.user.createMany({
             data: [
                 { name: 'John Doe', email: 'john.doe@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'ADMIN' },
+                { name: 'Owner', email: 'owner@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'OUTLET_OWNER' },
                 { name: 'Sugiono', email: 'sugiono@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'EMPLOYEE' },
             ],
         });

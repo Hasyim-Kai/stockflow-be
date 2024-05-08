@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'EMPLOYEE');
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'OUTLET_OWNER', 'EMPLOYEE');
 
 -- CreateEnum
 CREATE TYPE "QuantityUnit" AS ENUM ('Pcs', 'Liter', 'MiliLiter', 'Box', 'Cup', 'Bottle');
