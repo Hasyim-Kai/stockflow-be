@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
 import { compare } from 'bcrypt';
-import { JwtPayloadType } from './dto/jwt-payload';
+import { JwtPayloadType, SignInResType } from './dto/jwt-payload';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
     private prisma: PrismaService,
   ) { }
 
-  async signIn(email: string, password: string,): Promise<JwtPayloadType> {
+  async signIn(email: string, password: string,): Promise<SignInResType> {
     try {
       const user = await this.prisma.user.findFirst({ where: { email } });
       if (!user) {
@@ -26,7 +26,7 @@ export class AuthService {
         throw new UnauthorizedException(`Wrong password`);
       }
 
-      const payload = { userId: user.id, email: user.email, role: user.role };
+      const payload: JwtPayloadType = { userId: user.id, name: user.name, email: user.email, role: user.role, outletId: user.outletId };
       return {
         userId: user.id, name: user.name, email: user.email, role: user.role,
         token: await this.jwtService.signAsync(payload),
@@ -36,7 +36,7 @@ export class AuthService {
     }
   }
 
-  async verifyJwt(token: string): Promise<JwtPayloadType> {
+  async verifyJwt(token: string): Promise<SignInResType> {
     try {
       const decoded = await this.jwtService.verify(token, {
         secret: this.config.get<string>('JWT_SECRET'), // Replace with your secret key environment variable
