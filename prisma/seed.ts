@@ -14,14 +14,14 @@ async function main() {
         const outlet = await tx.outlet.create({
             data: {
                 name: 'Blue Outlet',
-                address: '123 Main Street',
+                address: 'Main Street 123',
                 // user: { connect: { id: users[0].id } }, // Connect to the first user (ADMIN)
             },
         });
 
         const user = await tx.user.createMany({
             data: [
-                { name: 'John Doe', email: 'john.doe@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'ADMIN' },
+                { name: 'admin', email: 'admin@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'ADMIN' },
                 { name: 'Owner', email: 'owner@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'OUTLET_OWNER' },
                 { name: 'Sugiono', email: 'sugiono@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'EMPLOYEE' },
             ],
@@ -29,9 +29,9 @@ async function main() {
 
         const product = await tx.product.createMany({
             data: [
-                { productCode: 'ER121', name: 'Ager', pricePerMiliLiter: 10000, quantity: 1, quantityUnit: "Liter", description: 'Product 1' },
-                { productCode: 'ER122', name: 'Rose', pricePerMiliLiter: 15000, quantity: 1.5, quantityUnit: "Liter", description: 'Product 2' },
-                { productCode: 'ER123', name: 'Wood', pricePerMiliLiter: 70000, quantity: 1.5, quantityUnit: "Liter", description: 'Product 3' },
+                { productCode: 'ER121', name: 'Ager', price: 10000, quantity: 1, quantityUnit: "Liter", description: 'Product 1' },
+                { productCode: 'ER122', name: 'Rose', price: 15000, quantity: 1.5, quantityUnit: "Liter", description: 'Product 2' },
+                { productCode: 'ER123', name: 'Wood', price: 70000, quantity: 1.5, quantityUnit: "Liter", description: 'Product 3' },
             ],
         });
 

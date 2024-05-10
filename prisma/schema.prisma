@@ -23,14 +23,18 @@ enum Role {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String @db.VarChar(100)
-  email    String @unique
-  password String @db.VarChar(100)
-  role     Role
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique
+  password  String   @db.VarChar(100)
+  role      Role
+  createdAt DateTime @default(now())
 
+  // one to one with outlet
   outlet   Outlet @relation(fields: [outletId], references: [id])
   outletId Int
+  // one to many with transaction
+  // transactions Transaction[]
 }
 
 model Outlet {
@@ -38,6 +42,7 @@ model Outlet {
   name    String @db.VarChar(100)
   address String
 
+  // one to one with user
   user User[]
 }
 
@@ -53,13 +58,56 @@ enum QuantityUnit {
 }
 
 model Product {
-  id                Int          @id @default(autoincrement())
-  productCode       String       @unique
-  name              String
-  pricePerMiliLiter Float
-  quantity          Float
-  quantityUnit      QuantityUnit
-  description       String
+  id           Int          @id @default(autoincrement())
+  productCode  String       @unique
+  name         String
+  price        Float
+  quantity     Float
+  quantityUnit QuantityUnit
+  description  String
+  isSealOpened Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+
+  // many to many with transaction through 'TransactionProduct'
+  // transactionProducts TransactionProduct[]
 }
 
-// Transactions Section =========================================================================
+// model Transaction {
+//   id         Int      @id @default(autoincrement())
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+//   totalPrice Float
+//   quantity   Int
+
+//   // one to many with user
+//   userId              Int
+//   user                User                 @relation(fields: [userId], references: [id])
+//   // many to many with transaction through 'TransactionProduct'
+//   transactionProducts TransactionProduct[]
+//   // one to one with Transaction
+//   invoice             Invoice?
+// }
+
+// model TransactionProduct {
+//   id Int @id @default(autoincrement())
+
+//   // Foreign key relationships
+//   transactionId Int
+//   transaction   Transaction @relation(fields: [transactionId], references: [id])
+//   productId     Int
+//   product       Product     @relation(fields: [productId], references: [id])
+
+//   // Unique constraint to prevent duplicate entries per transaction-product combination
+//   @@unique([transactionId, productId])
+// }
+
+// model Invoice {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   paid      Boolean  @default(false)
+
+//   // one to one with Transaction
+//   transaction   Transaction @relation(fields: [transactionId], references: [id])
+//   transactionId Int         @unique // relation scalar field (used in the `@relation` attribute above)
+// }
