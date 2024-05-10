@@ -28,6 +28,11 @@ export class ProductController {
     return this.productService.update(+id, updateProductDto);
   }
 
+  @Patch(':id')
+  openSeal(@Param('id', ParseIntPipe) id: string) {
+    return this.productService.openSeal(+id);
+  }
+
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: string) {
     return this.productService.remove(+id);

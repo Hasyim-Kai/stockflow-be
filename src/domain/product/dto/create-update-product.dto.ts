@@ -1,5 +1,5 @@
 import { QuantityUnit } from "@prisma/client";
-import { IsDecimal, IsString } from "class-validator";
+import { IsDecimal, IsString, IsNumber, IsBoolean, IsOptional } from "class-validator";
 
 export class CreateUpdateProductDto {
     @IsString()
@@ -8,10 +8,10 @@ export class CreateUpdateProductDto {
     @IsString()
     name: string;
 
-    @IsDecimal()
-    pricePerMiliLiter: number;
+    @IsNumber()
+    price: number;
 
-    @IsString()
+    @IsNumber()
     quantity: number;
 
     @IsString()
@@ -19,4 +19,8 @@ export class CreateUpdateProductDto {
 
     @IsString()
     description: string;
+
+    @IsBoolean()
+    @IsOptional()
+    isSealOpened: boolean;
 }
