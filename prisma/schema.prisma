@@ -31,10 +31,10 @@ model User {
   createdAt DateTime @default(now())
 
   // one to one with outlet
-  outlet   Outlet @relation(fields: [outletId], references: [id])
-  outletId Int
+  outlet       Outlet        @relation(fields: [outletId], references: [id])
+  outletId     Int
   // one to many with transaction
-  // transactions Transaction[]
+  transactions Transaction[]
 }
 
 model Outlet {
@@ -58,56 +58,66 @@ enum QuantityUnit {
 }
 
 model Product {
-  id           Int          @id @default(autoincrement())
-  productCode  String       @unique
-  name         String
-  price        Float
-  quantity     Float
-  quantityUnit QuantityUnit
-  description  String
-  isSealOpened Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @default(now()) @updatedAt
+  id             Int          @id @default(autoincrement())
+  productCode    String       @unique
+  name           String
+  price          Float
+  sealedQuantity Int          @default(0)
+  openedQuantity Int          @default(0)
+  quantityUnit   QuantityUnit @default(Bottle)
+  description    String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
 
   // many to many with transaction through 'TransactionProduct'
-  // transactionProducts TransactionProduct[]
+  transactionProducts TransactionProduct[]
 }
 
-// model Transaction {
-//   id         Int      @id @default(autoincrement())
-//   createdAt  DateTime @default(now())
-//   updatedAt  DateTime @updatedAt
-//   totalPrice Float
-//   quantity   Int
+enum TransactionType {
+  IN
+  OUT
+  ADJUSTMENT
+}
 
-//   // one to many with user
-//   userId              Int
-//   user                User                 @relation(fields: [userId], references: [id])
-//   // many to many with transaction through 'TransactionProduct'
-//   transactionProducts TransactionProduct[]
-//   // one to one with Transaction
-//   invoice             Invoice?
-// }
+model Transaction {
+  id         Int             @id @default(autoincrement())
+  totalPrice Float
+  type       TransactionType @default(IN)
+  isInvoiced Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
-// model TransactionProduct {
-//   id Int @id @default(autoincrement())
+  // one to many with user
+  userId              Int
+  user                User                 @relation(fields: [userId], references: [id])
+  // many to many with transaction through 'TransactionProduct'
+  transactionProducts TransactionProduct[]
+  // one to one with Transaction
+  invoice             Invoice?
+}
 
-//   // Foreign key relationships
-//   transactionId Int
-//   transaction   Transaction @relation(fields: [transactionId], references: [id])
-//   productId     Int
-//   product       Product     @relation(fields: [productId], references: [id])
+// THIS TABLE IS THE MID TABLE BETWEEN TRANSACTION & PRODUCT MANY-TO-MANY RELATION
+model TransactionProduct {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  sumPrice Float
 
-//   // Unique constraint to prevent duplicate entries per transaction-product combination
-//   @@unique([transactionId, productId])
-// }
+  // Foreign key relationships
+  transactionId Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  productId     Int
+  product       Product     @relation(fields: [productId], references: [id])
 
-// model Invoice {
-//   id        Int      @id @default(autoincrement())
-//   createdAt DateTime @default(now())
-//   paid      Boolean  @default(false)
+  // Unique constraint to prevent duplicate entries per transaction-product combination
+  @@unique([transactionId, productId])
+}
 
-//   // one to one with Transaction
-//   transaction   Transaction @relation(fields: [transactionId], references: [id])
-//   transactionId Int         @unique // relation scalar field (used in the `@relation` attribute above)
-// }
+model Invoice {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  paid      Boolean  @default(false)
+
+  // one to one with Transaction
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId Int         @unique // relation scalar field (used in the `@relation` attribute above)
+}

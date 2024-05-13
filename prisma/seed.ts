@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 async function main() {
     const saltRounds = 10; // Adjust salt rounds as needed
-    prisma.$transaction(async (tx) => {
-        await tx.user.deleteMany({});
-        await tx.outlet.deleteMany({});
-        await tx.product.deleteMany({});
+    await prisma.$transaction(async (tx) => {
+        // await tx.user.deleteMany({});
+        // await tx.outlet.deleteMany({});
+        // await tx.product.deleteMany({});
 
         // Seed an outlet associated with the first user (ADMIN)
         const outlet = await tx.outlet.create({
@@ -19,7 +19,7 @@ async function main() {
             },
         });
 
-        const user = await tx.user.createMany({
+        await tx.user.createMany({
             data: [
                 { name: 'admin', email: 'admin@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'ADMIN' },
                 { name: 'Owner', email: 'owner@gmail.com', password: hashSync('password', saltRounds), outletId: outlet.id, role: 'OUTLET_OWNER' },
@@ -27,18 +27,44 @@ async function main() {
             ],
         });
 
-        const product = await tx.product.createMany({
+        await tx.product.createMany({
             data: [
-                { productCode: 'ER121', name: 'Ager', price: 10000, quantity: 1, quantityUnit: "Liter", description: 'Product 1' },
-                { productCode: 'ER122', name: 'Rose', price: 15000, quantity: 1.5, quantityUnit: "Liter", description: 'Product 2' },
-                { productCode: 'ER123', name: 'Wood', price: 70000, quantity: 1.5, quantityUnit: "Liter", description: 'Product 3' },
+                { productCode: 'ER121', name: 'Ager', price: 10000, sealedQuantity: 0, openedQuantity: 0, description: 'Product 1' },
+                { productCode: 'ER122', name: 'Rose', price: 15000, sealedQuantity: 0, openedQuantity: 0, description: 'Product 2' },
+                { productCode: 'ER123', name: 'Wood', price: 70000, sealedQuantity: 0, openedQuantity: 0, description: 'Product 3' },
             ],
         });
 
+        const user = await tx.user.findFirst({
+            where: {
+                name: 'Sugiono'
+            }
+        })
+        const product = await tx.product.findMany({
+            take: 2
+        })
 
-        console.log(`Created users:`, user);
-        console.log(`Created outlet:`, outlet);
-        console.log(`Created outlet:`, product);
+        const transaction = await tx.transaction.create({
+            data: {
+                userId: user.id, // Connect to John Doe
+                totalPrice: 60000,
+                type: "IN",
+                transactionProducts: {
+                    createMany: {
+                        data: [
+                            { quantity: 10, productId: product[0].id, sumPrice: product[0].price * 10 },
+                            { quantity: 10, productId: product[1].id, sumPrice: product[1].price * 10 },
+                        ]
+                    }
+                },
+            },
+        });
+
+
+        // console.log(`Created users:`, user);
+        // console.log(`Created outlet:`, outlet);
+        // console.log(`Created Product:`, product);
+        // console.log(`Created transaction:`, transaction);
     })
 }
 
