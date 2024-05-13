@@ -79,26 +79,6 @@ export class ProductService {
     }
   }
 
-  async openSeal(id: number): Promise<Product> {
-    try {
-      const product = await this.prisma.product.update({
-        where: { id },
-        data: { isSealOpened: true },
-      });
-      return product;
-    } catch (error) {
-      // Handle Prisma-specific errors (similar to create)
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') { // Unique constraint violation
-          throw new HttpException('Code already exists', HttpStatus.BAD_REQUEST);
-        } else {
-          throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-      }
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   async remove(id: number): Promise<void> {
     try {
       await this.prisma.product.delete({ where: { id } });

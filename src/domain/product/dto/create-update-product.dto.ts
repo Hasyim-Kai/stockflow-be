@@ -12,15 +12,16 @@ export class CreateUpdateProductDto {
     price: number;
 
     @IsNumber()
-    quantity: number;
+    @IsOptional()
+    sealedQuantity: number;
+
+    @IsNumber()
+    @IsOptional()
+    openedQuantity: number;
 
     @IsString()
     quantityUnit: QuantityUnit;
 
     @IsString()
     description: string;
-
-    @IsBoolean()
-    @IsOptional()
-    isSealOpened: boolean;
 }
