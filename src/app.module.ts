@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './domain/user/user.module';
+import { UserModule } from './domain/master-data/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './services/prisma/prisma.module';
-import { ProductModule } from './domain/product/product.module';
-import { OutletModule } from './domain/outlet/outlet.module';
+import { ProductModule } from './domain/master-data/product/product.module';
+import { OutletModule } from './domain/master-data/outlet/outlet.module';
 import { ProductTransactionModule } from './domain/transaction/product-transaction/product-transaction.module';
 
 @Module({

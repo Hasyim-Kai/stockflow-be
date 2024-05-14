@@ -1,5 +1,4 @@
 import { Injectable, Dependencies, UnauthorizedException, NotFoundException } from '@nestjs/common';
-import { UserService } from '@/domain/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/services/prisma/prisma.service';
