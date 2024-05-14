@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './domain/user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule } from './services/prisma/prisma.module';
 import { ProductModule } from './domain/product/product.module';
 import { OutletModule } from './domain/outlet/outlet.module';
 import { ProductTransactionModule } from './domain/transaction/product-transaction/product-transaction.module';
