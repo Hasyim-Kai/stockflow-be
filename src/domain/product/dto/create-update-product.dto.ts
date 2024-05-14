@@ -1,5 +1,5 @@
 import { QuantityUnit } from "@prisma/client";
-import { IsDecimal, IsString, IsNumber, IsBoolean, IsOptional } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateUpdateProductDto {
     @IsString()

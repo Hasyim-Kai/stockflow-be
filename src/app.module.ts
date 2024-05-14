@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './domain/product/product.module';
 import { OutletModule } from './domain/outlet/outlet.module';
+import { ProductTransactionModule } from './domain/transaction/product-transaction/product-transaction.module';
 
 @Module({
   imports: [
@@ -17,6 +18,9 @@ import { OutletModule } from './domain/outlet/outlet.module';
     UserModule,
     OutletModule,
     ProductModule,
+
+    ProductTransactionModule,
+
 
   ],
   controllers: [AppController],

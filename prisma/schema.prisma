@@ -79,11 +79,16 @@ enum TransactionType {
   ADJUSTMENT
 }
 
+enum YesNoType {
+  YES
+  NO
+}
+
 model Transaction {
   id         Int             @id @default(autoincrement())
   totalPrice Float
   type       TransactionType @default(IN)
-  isInvoiced Boolean         @default(false)
+  isInvoiced YesNoType       @default(NO)
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 

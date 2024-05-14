@@ -6,10 +6,6 @@ const prisma = new PrismaClient();
 async function main() {
     const saltRounds = 10; // Adjust salt rounds as needed
     await prisma.$transaction(async (tx) => {
-        // await tx.user.deleteMany({});
-        // await tx.outlet.deleteMany({});
-        // await tx.product.deleteMany({});
-
         // Seed an outlet associated with the first user (ADMIN)
         const outlet = await tx.outlet.create({
             data: {
