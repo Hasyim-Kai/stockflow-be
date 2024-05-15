@@ -42,8 +42,14 @@ model Outlet {
   name    String @db.VarChar(100)
   address String
 
-  // one to one with user
-  user User[]
+  // one to many with user
+  user        User[]
+  // one to many with Product
+  product     Product[]
+  // one to many with Transaction
+  transaction Transaction[]
+  // one to many with Invoice
+  invoice     Invoice[]
 }
 
 // Product Section =========================================================================
@@ -59,7 +65,7 @@ enum QuantityUnit {
 
 model Product {
   id             Int          @id @default(autoincrement())
-  productCode    String       @unique
+  productCode    String
   name           String
   price          Float
   sealedQuantity Int          @default(0)
@@ -71,6 +77,9 @@ model Product {
 
   // many to many with transaction through 'TransactionProduct'
   transactionProducts TransactionProduct[]
+  // one to many with Outlet as Foreign key
+  outlet              Outlet               @relation(fields: [outletId], references: [id])
+  outletId            Int                  @unique // relation scalar field (used in the `@relation` attribute above)
 }
 
 enum TransactionType {
@@ -90,13 +99,16 @@ model Transaction {
   type       TransactionType @default(IN)
   isInvoiced YesNoType       @default(NO)
   createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  updatedAt  DateTime        @default(now()) @updatedAt
 
   // one to many with user
   userId              Int
   user                User                 @relation(fields: [userId], references: [id])
   // many to many with transaction through 'TransactionProduct'
   transactionProducts TransactionProduct[]
+  // one to many with Outlet as Foreign key
+  outlet              Outlet               @relation(fields: [outletId], references: [id])
+  outletId            Int                  @unique // relation scalar field (used in the `@relation` attribute above)
   // one to one with Transaction
   invoice             Invoice?
 }
@@ -125,4 +137,7 @@ model Invoice {
   // one to one with Transaction
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   transactionId Int         @unique // relation scalar field (used in the `@relation` attribute above)
+  // one to many with Outlet as Foreign key
+  outlet        Outlet      @relation(fields: [outletId], references: [id])
+  outletId      Int         @unique // relation scalar field (used in the `@relation` attribute above)
 }

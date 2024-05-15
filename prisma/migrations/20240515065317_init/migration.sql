@@ -7,6 +7,9 @@ CREATE TYPE "QuantityUnit" AS ENUM ('Pcs', 'Liter', 'MiliLiter', 'Box', 'Cup', '
 -- CreateEnum
 CREATE TYPE "TransactionType" AS ENUM ('IN', 'OUT', 'ADJUSTMENT');
 
+-- CreateEnum
+CREATE TYPE "YesNoType" AS ENUM ('YES', 'NO');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -41,6 +44,7 @@ CREATE TABLE "Product" (
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "outletId" INTEGER NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -50,10 +54,11 @@ CREATE TABLE "Transaction" (
     "id" SERIAL NOT NULL,
     "totalPrice" DOUBLE PRECISION NOT NULL,
     "type" "TransactionType" NOT NULL DEFAULT 'IN',
-    "isInvoiced" BOOLEAN NOT NULL DEFAULT false,
+    "isInvoiced" "YesNoType" NOT NULL DEFAULT 'NO',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" INTEGER NOT NULL,
+    "outletId" INTEGER NOT NULL,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
 );
@@ -75,6 +80,7 @@ CREATE TABLE "Invoice" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "paid" BOOLEAN NOT NULL DEFAULT false,
     "transactionId" INTEGER NOT NULL,
+    "outletId" INTEGER NOT NULL,
 
     CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
 );
@@ -83,7 +89,10 @@ CREATE TABLE "Invoice" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Product_productCode_key" ON "Product"("productCode");
+CREATE UNIQUE INDEX "Product_outletId_key" ON "Product"("outletId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Transaction_outletId_key" ON "Transaction"("outletId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TransactionProduct_transactionId_productId_key" ON "TransactionProduct"("transactionId", "productId");
@@ -91,11 +100,20 @@ CREATE UNIQUE INDEX "TransactionProduct_transactionId_productId_key" ON "Transac
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_transactionId_key" ON "Invoice"("transactionId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Invoice_outletId_key" ON "Invoice"("outletId");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_outletId_fkey" FOREIGN KEY ("outletId") REFERENCES "Outlet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_outletId_fkey" FOREIGN KEY ("outletId") REFERENCES "Outlet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_outletId_fkey" FOREIGN KEY ("outletId") REFERENCES "Outlet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TransactionProduct" ADD CONSTRAINT "TransactionProduct_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -105,3 +123,6 @@ ALTER TABLE "TransactionProduct" ADD CONSTRAINT "TransactionProduct_productId_fk
 
 -- AddForeignKey
 ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_outletId_fkey" FOREIGN KEY ("outletId") REFERENCES "Outlet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
