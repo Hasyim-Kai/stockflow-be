@@ -1,6 +1,6 @@
 import { PrismaService } from '@/services/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { Product, Transaction } from '@prisma/client';
+import { Outlet, Product, Transaction } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { CreateUpdateProductTransactionDto } from './dto/create-update-product-transaction.dto';
 import { JwtPayloadType } from '@/auth/dto/jwt-payload';
@@ -128,31 +128,31 @@ export class ProductTransactionService {
 
   async getAllOutletWithNoTransactionsPastThreeDays() {
     try {
+      let allOutletWithTransactionsPastThreeDays, outletWithNoTransactionsPastThreeDays;
       const threeDaysAgo = new Date();
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
 
-      const AllOutletNewTransactions = await this.prisma.transaction.groupBy({
-        by: [`outletId`],
-        where: {
-          createdAt: {
-            gte: threeDaysAgo
+      await this.prisma.$transaction(async (tx) => {
+        allOutletWithTransactionsPastThreeDays = await tx.transaction.groupBy({
+          by: [`outletId`],
+          where: {
+            createdAt: {
+              gte: threeDaysAgo
+            }
+          },
+        })
+
+        outletWithNoTransactionsPastThreeDays = await tx.outlet.findMany({
+          where: {
+            id: {
+              notIn: allOutletWithTransactionsPastThreeDays.map((outlet) => outlet.outletId)
+            }
           }
-        },
-        // _count: {
-        //   id: true
-        // },
-        // having: {
-        //   id: {
-        //     _count: {
-        //       equals: 0
-        //     }
-        //   }
-        // }
+        })
       })
 
-      return AllOutletNewTransactions;
+      return outletWithNoTransactionsPastThreeDays;
     } catch (error) {
-      console.log(error.message)
       // Handle potential Prisma errors here (e.g., record not found)
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') { // Record not found
