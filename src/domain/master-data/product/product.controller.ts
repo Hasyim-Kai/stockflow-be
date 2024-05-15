@@ -26,8 +26,8 @@ export class ProductController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: string, @Body() updateProductDto: CreateUpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  update(@Param('id', ParseIntPipe) id: string, @Body() updateProductDto: CreateUpdateProductDto, @CurrentUser() user: JwtPayloadType) {
+    return this.productService.update(+id, updateProductDto, user);
   }
 
   @Delete(':id')

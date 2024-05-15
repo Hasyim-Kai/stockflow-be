@@ -31,8 +31,8 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: string, @Body() updateUserDto: CreateUpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param('id', ParseIntPipe) id: string, @Body() updateUserDto: CreateUpdateUserDto, @CurrentUser() user: JwtPayloadType) {
+    return this.userService.update(+id, updateUserDto, user);
   }
 
   @Delete(':id')

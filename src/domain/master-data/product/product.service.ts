@@ -67,8 +67,9 @@ export class ProductService {
     }
   }
 
-  async update(id: number, updateProductDto: CreateUpdateProductDto): Promise<Product> {
+  async update(id: number, updateProductDto: CreateUpdateProductDto, currentUser: JwtPayloadType): Promise<Product> {
     try {
+      updateProductDto.outletId = currentUser.outletId
       const product = await this.prisma.product.update({
         where: { id },
         data: updateProductDto,

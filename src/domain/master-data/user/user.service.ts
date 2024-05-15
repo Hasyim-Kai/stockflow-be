@@ -69,8 +69,9 @@ export class UserService {
     }
   }
 
-  async update(id: number, updateUserDto: CreateUpdateUserDto): Promise<User> {
+  async update(id: number, updateUserDto: CreateUpdateUserDto, currentUser: JwtPayloadType): Promise<User> {
     try {
+      updateUserDto.outletId = currentUser.outletId
       const user = await this.prisma.user.update({
         where: { id },
         data: updateUserDto,
