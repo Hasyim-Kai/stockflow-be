@@ -79,7 +79,7 @@ model Product {
   transactionProducts TransactionProduct[]
   // one to many with Outlet as Foreign key
   outlet              Outlet               @relation(fields: [outletId], references: [id])
-  outletId            Int                  @unique // relation scalar field (used in the `@relation` attribute above)
+  outletId            Int
 }
 
 enum TransactionType {
@@ -107,8 +107,8 @@ model Transaction {
   // many to many with transaction through 'TransactionProduct'
   transactionProducts TransactionProduct[]
   // one to many with Outlet as Foreign key
+  outletId            Int
   outlet              Outlet               @relation(fields: [outletId], references: [id])
-  outletId            Int                  @unique // relation scalar field (used in the `@relation` attribute above)
   // one to one with Transaction
   invoice             Invoice?
 }
@@ -139,5 +139,5 @@ model Invoice {
   transactionId Int         @unique // relation scalar field (used in the `@relation` attribute above)
   // one to many with Outlet as Foreign key
   outlet        Outlet      @relation(fields: [outletId], references: [id])
-  outletId      Int         @unique // relation scalar field (used in the `@relation` attribute above)
+  outletId      Int
 }

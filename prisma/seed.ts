@@ -38,30 +38,30 @@ async function main() {
             }
         });
 
-        const user = await tx.user.findFirst({
-            where: {
-                name: 'Sugiono'
-            }
-        })
-        const product = await tx.product.findMany({
-            take: 2
-        })
+        // const user = await tx.user.findFirst({
+        //     where: {
+        //         name: 'Sugiono'
+        //     }
+        // })
+        // const product = await tx.product.findMany({
+        //     take: 2
+        // })
 
-        const transaction = await tx.transaction.create({
-            data: {
-                userId: user.id, // Connect to John Doe
-                outletId: outlet1.id,
-                totalPrice: 60000,
-                type: "IN",
-                transactionProducts: {
-                    createMany: {
-                        data: [
-                            { quantity: 10, productId: product[0].id, sumPrice: product[0].price * 10 },
-                        ]
-                    }
-                },
-            },
-        });
+        // const transaction = await tx.transaction.create({
+        //     data: {
+        //         userId: user.id, // Connect to John Doe
+        //         outletId: outlet1.id,
+        //         totalPrice: 60000,
+        //         type: "IN",
+        //         transactionProducts: {
+        //             createMany: {
+        //                 data: [
+        //                     { quantity: 10, productId: product[0].id, sumPrice: product[0].price * 10 },
+        //                 ]
+        //             }
+        //         },
+        //     },
+        // });
 
 
         // console.log(`Created users:`, user);

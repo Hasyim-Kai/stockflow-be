@@ -89,19 +89,10 @@ CREATE TABLE "Invoice" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Product_outletId_key" ON "Product"("outletId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Transaction_outletId_key" ON "Transaction"("outletId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "TransactionProduct_transactionId_productId_key" ON "TransactionProduct"("transactionId", "productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Invoice_transactionId_key" ON "Invoice"("transactionId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Invoice_outletId_key" ON "Invoice"("outletId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_outletId_fkey" FOREIGN KEY ("outletId") REFERENCES "Outlet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

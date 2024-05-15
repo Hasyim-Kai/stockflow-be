@@ -7,8 +7,4 @@ export class CreateUpdateProductTransactionDto {
 
     @IsArray()
     products: { productId: number, quantity: number, sumPrice: number }[];
-
-    @IsString()
-    @IsOptional()
-    outletId: number;
 }
