@@ -9,14 +9,14 @@ async function main() {
         // Seed an outlet associated with the first user (ADMIN)
         const outlet1 = await tx.outlet.create({
             data: {
-                name: 'Blue Outlet',
+                name: 'Jakarta Outlet',
                 address: 'Main Street 123',
             },
         });
 
         const outlet2 = await tx.outlet.create({
             data: {
-                name: 'Dark Outlet',
+                name: 'Surabaya Outlet',
                 address: 'Main Street 121',
             },
         });
@@ -24,9 +24,9 @@ async function main() {
         await tx.user.createMany({
             data: [
                 { name: 'admin', email: 'admin@gmail.com', password: hashSync('password', saltRounds), outletId: outlet1.id, role: 'ADMIN' },
-                { name: 'Owner', email: 'owner@gmail.com', password: hashSync('password', saltRounds), outletId: outlet1.id, role: 'OUTLET_OWNER' },
+                { name: 'Jakarta Owner', email: 'jakarta@gmail.com', password: hashSync('password', saltRounds), outletId: outlet1.id, role: 'OUTLET_OWNER' },
                 { name: 'Sugiono', email: 'sugiono@gmail.com', password: hashSync('password', saltRounds), outletId: outlet1.id, role: 'EMPLOYEE' },
-                { name: 'Momon', email: 'momon@gmail.com', password: hashSync('password', saltRounds), outletId: outlet2.id, role: 'OUTLET_OWNER' },
+                { name: 'Surabaya Owner', email: 'surabaya@gmail.com', password: hashSync('password', saltRounds), outletId: outlet2.id, role: 'OUTLET_OWNER' },
             ],
         });
 
