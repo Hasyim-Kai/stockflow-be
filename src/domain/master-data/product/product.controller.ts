@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGua
 import { ProductService } from './product.service';
 import { CreateUpdateProductDto } from './dto/create-update-product.dto';
 import { AuthGuard } from '@/auth/auth.guard';
+import { JwtPayloadType } from '@/auth/dto/jwt-payload';
+import { CurrentUser } from '@/decorator/current-user';
 
 @UseGuards(AuthGuard)
 @Controller('product')
@@ -9,13 +11,13 @@ export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
   @Post()
-  create(@Body() dto: CreateUpdateProductDto) {
-    return this.productService.create(dto);
+  create(@Body() dto: CreateUpdateProductDto, @CurrentUser() user: JwtPayloadType) {
+    return this.productService.create(dto, user);
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  findAll(@CurrentUser() user: JwtPayloadType) {
+    return this.productService.findAll(user);
   }
 
   @Get(':id')

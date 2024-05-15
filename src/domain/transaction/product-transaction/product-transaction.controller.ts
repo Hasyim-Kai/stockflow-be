@@ -1,21 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProductTransactionService } from './product-transaction.service';
 import { CreateUpdateProductTransactionDto } from './dto/create-update-product-transaction.dto';
 import { CurrentUser } from '@/decorator/current-user';
 import { JwtPayloadType } from '@/auth/dto/jwt-payload';
+import { AuthGuard } from '@/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('transaction/product')
 export class ProductTransactionController {
   constructor(private readonly productTransactionService: ProductTransactionService) { }
 
   @Post()
-  create(@Body() createProductTransactionDto: CreateUpdateProductTransactionDto) {
-    return this.productTransactionService.create(createProductTransactionDto);
+  create(@Body() createProductTransactionDto: CreateUpdateProductTransactionDto,
+    @CurrentUser() user: JwtPayloadType) {
+    return this.productTransactionService.create(createProductTransactionDto, user);
   }
 
   @Get()
-  findAll() {
-    return this.productTransactionService.findAll();
+  findAll(@CurrentUser() user: JwtPayloadType) {
+    return this.productTransactionService.findAll(user);
+  }
+
+  @Get('outlet-no-transactions')
+  getAllOutletWithNoTransactionsPastThreeDays() {
+    return this.productTransactionService.getAllOutletWithNoTransactionsPastThreeDays();
   }
 
   @Get(':id')

@@ -1,5 +1,5 @@
 import { Role } from "@prisma/client";
-import { IsOptional, IsString } from "class-validator";
+import { IsInt, IsOptional, IsString } from "class-validator";
 
 export class CreateUpdateUserDto {
     @IsString()
@@ -14,7 +14,7 @@ export class CreateUpdateUserDto {
     @IsString()
     role: Role;
 
-    @IsString()
+    @IsInt()
     @IsOptional()
     outletId: number;
 }

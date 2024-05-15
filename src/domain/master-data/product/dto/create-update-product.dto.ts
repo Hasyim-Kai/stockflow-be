@@ -24,4 +24,8 @@ export class CreateUpdateProductDto {
 
     @IsString()
     description: string;
+
+    @IsString()
+    @IsOptional()
+    outletId: number;
 }

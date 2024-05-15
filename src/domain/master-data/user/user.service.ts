@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { CreateUpdateUserDto } from './dto/create-update-user.dto';
+import { JwtPayloadType } from '@/auth/dto/jwt-payload';
 
 @Injectable()
 export class UserService {
@@ -10,9 +11,11 @@ export class UserService {
     private prisma: PrismaService,
   ) { }
 
-  async create(dto: CreateUpdateUserDto, currentUser): Promise<User> {
+  async create(dto: CreateUpdateUserDto, currentUser: JwtPayloadType): Promise<User> {
     try {
-      dto.outletId = currentUser.outletId
+      if (!dto.outletId) {
+        dto.outletId = currentUser.outletId
+      }
       const user = await this.prisma.user.create({
         data: dto,
       });
@@ -31,9 +34,12 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(user: JwtPayloadType): Promise<User[]> {
     try {
       const users = await this.prisma.user.findMany({
+        where: {
+          outletId: user.outletId
+        },
         include: { outlet: true }
       });
       return users;

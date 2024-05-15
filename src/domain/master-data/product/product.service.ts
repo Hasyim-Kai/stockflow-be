@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { Product } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { CreateUpdateProductDto } from './dto/create-update-product.dto';
+import { JwtPayloadType } from '@/auth/dto/jwt-payload';
 
 @Injectable()
 export class ProductService {
@@ -10,10 +11,13 @@ export class ProductService {
     private prisma: PrismaService,
   ) { }
 
-  async create(dto: CreateUpdateProductDto): Promise<Product> {
+  async create(dto: CreateUpdateProductDto, user: JwtPayloadType): Promise<Product> {
     try {
       const product = await this.prisma.product.create({
-        data: dto,
+        data: {
+          ...dto,
+          outletId: user.outletId
+        },
       });
       return product;
     } catch (error) {
@@ -30,9 +34,13 @@ export class ProductService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(user: JwtPayloadType): Promise<Product[]> {
     try {
-      const products = await this.prisma.product.findMany();
+      const products = await this.prisma.product.findMany({
+        where: {
+          outletId: user.outletId
+        }
+      });
       return products;
     } catch (error) {
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);

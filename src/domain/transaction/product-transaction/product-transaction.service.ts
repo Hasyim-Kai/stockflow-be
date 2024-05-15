@@ -11,13 +11,14 @@ export class ProductTransactionService {
     private prisma: PrismaService,
   ) { }
 
-  async create(dto: CreateUpdateProductTransactionDto): Promise<Transaction> {
+  async create(dto: CreateUpdateProductTransactionDto, currentUser: JwtPayloadType): Promise<Transaction> {
     try {
       let transaction: Transaction;
       await this.prisma.$transaction(async (tx) => {
         transaction = await tx.transaction.create({
           data: {
-            userId: dto.userId,
+            userId: currentUser.userId,
+            outletId: currentUser.outletId,
             totalPrice: dto.products.reduce((total, product) => total + product.sumPrice, 0),
             type: dto.type,
             transactionProducts: {
@@ -71,9 +72,12 @@ export class ProductTransactionService {
     }
   }
 
-  async findAll(): Promise<Transaction[]> {
+  async findAll(user: JwtPayloadType): Promise<Transaction[]> {
     try {
       const transactions = await this.prisma.transaction.findMany({
+        where: {
+          outletId: user.outletId
+        },
         include: {
           user: {
             select: {
@@ -92,11 +96,63 @@ export class ProductTransactionService {
     try {
       const transaction = await this.prisma.transaction.findUnique({
         where: { id },
-        include: { user: true, transactionProducts: { include: { product: true } } },
+        include: {
+          user: {
+            select: { name: true }
+          },
+          transactionProducts: {
+            include: {
+              product: {
+                select: {
+                  name: true, price: true, productCode: true
+                }
+              }
+            }
+          }
+        },
       });
 
       return transaction;
     } catch (error) {
+      // Handle potential Prisma errors here (e.g., record not found)
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') { // Record not found
+          throw new NotFoundException('Record not found');
+        } else {
+          throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      }
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getAllOutletWithNoTransactionsPastThreeDays() {
+    try {
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+
+      const AllOutletNewTransactions = await this.prisma.transaction.groupBy({
+        by: [`outletId`],
+        where: {
+          createdAt: {
+            gte: threeDaysAgo
+          }
+        },
+        // _count: {
+        //   id: true
+        // },
+        // having: {
+        //   id: {
+        //     _count: {
+        //       equals: 0
+        //     }
+        //   }
+        // }
+      })
+
+      return AllOutletNewTransactions;
+    } catch (error) {
+      console.log(error.message)
       // Handle potential Prisma errors here (e.g., record not found)
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2025') { // Record not found

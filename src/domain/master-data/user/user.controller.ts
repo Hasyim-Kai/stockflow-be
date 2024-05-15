@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CreateUpdateUserDto } from './dto/create-update-user.dto';
 import { AuthGuard } from '@/auth/auth.guard';
 import { CurrentUser } from '@/decorator/current-user';
+import { JwtPayloadType } from '@/auth/dto/jwt-payload';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -10,13 +11,13 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Post()
-  create(@Body() dto: CreateUpdateUserDto, @CurrentUser() user) {
+  create(@Body() dto: CreateUpdateUserDto, @CurrentUser() user: JwtPayloadType) {
     return this.userService.create(dto, user);
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@CurrentUser() user: JwtPayloadType) {
+    return this.userService.findAll(user);
   }
 
   // @Get(`current`)
