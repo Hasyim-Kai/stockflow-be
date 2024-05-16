@@ -109,8 +109,9 @@ model Transaction {
   // one to many with Outlet as Foreign key
   outletId            Int
   outlet              Outlet               @relation(fields: [outletId], references: [id])
-  // one to one with Transaction
-  invoice             Invoice?
+  // one to many with Invoice as foreign key
+  invoice             Invoice?             @relation(fields: [invoiceId], references: [id])
+  invoiceId           Int?
 }
 
 // THIS TABLE IS THE MID TABLE BETWEEN TRANSACTION & PRODUCT MANY-TO-MANY RELATION
@@ -134,10 +135,9 @@ model Invoice {
   createdAt DateTime @default(now())
   paid      Boolean  @default(false)
 
-  // one to one with Transaction
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  transactionId Int         @unique // relation scalar field (used in the `@relation` attribute above)
   // one to many with Outlet as Foreign key
-  outlet        Outlet      @relation(fields: [outletId], references: [id])
-  outletId      Int
+  outlet      Outlet        @relation(fields: [outletId], references: [id])
+  outletId    Int
+  // one to many with Transaction
+  transaction Transaction[]
 }
