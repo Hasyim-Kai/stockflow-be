@@ -147,11 +147,19 @@ export class ProductTransactionService {
             id: {
               notIn: allOutletWithTransactionsPastThreeDays.map((outlet) => outlet.outletId)
             }
+          },
+          select: {
+            name: true, address: true
           }
         })
       })
 
-      return outletWithNoTransactionsPastThreeDays;
+      const message = `${outletWithNoTransactionsPastThreeDays.map((outlet, index: number) => `${index === 0 ? '' : ' '}${outlet.name} (${outlet.address})`)}`
+      return {
+        headline: `Outlet With No Transactions`,
+        message,
+        source: `Konsinyasi Distributor App`
+      };
     } catch (error) {
       // Handle potential Prisma errors here (e.g., record not found)
       if (error instanceof PrismaClientKnownRequestError) {

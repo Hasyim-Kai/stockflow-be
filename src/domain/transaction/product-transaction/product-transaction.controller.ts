@@ -21,7 +21,8 @@ export class ProductTransactionController {
     return this.productTransactionService.findAll(user);
   }
 
-  @Get('outlet-no-transactions')
+  // it's on purpose placing this on top of @Get(`:id`)
+  @Get('no-transactions-outlet')
   getAllOutletWithNoTransactionsPastThreeDays() {
     return this.productTransactionService.getAllOutletWithNoTransactionsPastThreeDays();
   }
