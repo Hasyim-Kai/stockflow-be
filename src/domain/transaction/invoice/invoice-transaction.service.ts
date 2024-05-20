@@ -66,35 +66,46 @@ export class InvoiceTransactionService {
   async generateInvoiceForAllNotInvoicedTransactions() {
     try {
       await this.prisma.$transaction(async (tx) => {
-        // 1. get All outlet With Not Invoiced Transactions
-        const outletWithNotInvoicedTransactions = await tx.transaction.groupBy({
+        // 1. get All outlet ID With Not Invoiced Transactions
+        const outletIdWithNotInvoicedOutTransactions = await tx.transaction.groupBy({
           by: [`outletId`],
           where: {
+            type: 'OUT',
             isInvoiced: 'NO',
           },
         })
 
-        if (outletWithNotInvoicedTransactions.length > 0) {
-          // 2. create many invoice based on all outlet id, after created, get it's id
-          const newInvoices: { id: number, outletId: number }[] = await tx.$queryRaw`INSERT INTO "Invoice" ("outletId")
-            VALUES ${Prisma.join(outletWithNotInvoicedTransactions.map((outlet) => Prisma.sql`(${outlet.outletId})`))}
-            RETURNING "id","outletId"`
-          console.log(newInvoices)
+        await Promise.all(outletIdWithNotInvoicedOutTransactions.map(async (outlet) => {
+          const outletsNotInvoicedOutTransactions = await tx.transaction.findMany({
+            where: {
+              outletId: outlet.outletId,
+              isInvoiced: 'NO',
+              type: 'OUT'
+            },
+          })
+          // console.log(outletsNotInvoicedOutTransactions)
+          const newInvoice = await tx.invoice.create({
+            data: {
+              outletId: outlet.outletId,
+              invoiceGrandTotalPrice: outletsNotInvoicedOutTransactions.reduce((total, current) => total + current.totalPrice, 0),
+            }
+          })
+          await tx.transaction.updateMany({
+            where: {
+              outletId: outlet.outletId,
+              isInvoiced: 'NO',
+              type: 'OUT'
+            },
+            data: {
+              invoiceId: newInvoice.id,
+              isInvoiced: 'YES'
+            }
+          })
+        }))
 
-          // 3. update every transactions only it's invoiceId with recent created invoiceId, where outletId same & isInvoiced = NO
-          await Promise.all(newInvoices.map(async (invoice) => {
-            await tx.transaction.updateMany({
-              where: {
-                outletId: invoice.outletId,
-                isInvoiced: 'NO',
-              },
-              data: {
-                invoiceId: invoice.id,
-                isInvoiced: 'YES'
-              }
-            })
-          }))
-        }
+        // const newInvoices: { id: number, outletId: number }[] = await tx.$queryRaw`INSERT INTO "Invoice" ("outletId")
+        //   VALUES ${Prisma.join(outletsNotInvoicedOutTransactions.map((outlet) => Prisma.sql`(${outlet.outletId})`))}
+        //   RETURNING "id","outletId"`
       })
 
       // return newInvoices;

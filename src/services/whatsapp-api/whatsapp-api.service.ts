@@ -29,10 +29,10 @@ export class WhatsappApiService {
     }
   }
 
-  async sendMessageToAdmin(phone: string, message: string, session: string = 'sistem',) {
+  async sendMessageToAdmin(message: string, session: string = 'sistem',) {
     try {
       await this.watsap.post('/sendText', {
-        chatId: `${phone.replace(/^0/, '62')}@c.us`,
+        chatId: `${6289602602683}@c.us`,
         text: message,
         session: session,
       });

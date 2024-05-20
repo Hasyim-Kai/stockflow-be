@@ -30,12 +30,19 @@ async function main() {
             ],
         });
 
-        await tx.product.create({
-            data: {
-                productCode: 'ER123', name: 'Wood', price: 70000,
-                sealedQuantity: 0, openedQuantity: 0, outletId: outlet1.id,
-                description: 'Product 3'
-            }
+        await tx.product.createMany({
+            data: [
+                {
+                    productCode: 'ER123', name: 'Wood', price: 70000,
+                    outletId: outlet1.id,
+                    description: 'Product 3'
+                },
+                {
+                    productCode: 'ER113', name: 'Light', price: 70000,
+                    outletId: outlet2.id,
+                    description: 'Product 3'
+                }
+            ]
         });
 
         // const user = await tx.user.findFirst({

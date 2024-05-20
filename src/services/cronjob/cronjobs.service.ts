@@ -24,6 +24,7 @@ export class CronjobsService {
         }
     }
 
+    // @Cron(CronExpression.EVERY_10_SECONDS) // every 3 days at 9 am
     @Cron(`0 9 */3 * *`) // every 3 days at 9 am
     async invoiceTransactionOnEachOutletEvery3Days() {
         await this.transactionInvoiceService.generateInvoiceForAllNotInvoicedTransactions()

@@ -131,9 +131,9 @@ model TransactionProduct {
 }
 
 model Invoice {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  paid      Boolean  @default(false)
+  id                     Int      @id @default(autoincrement())
+  createdAt              DateTime @default(now())
+  invoiceGrandTotalPrice Float
 
   // one to many with Outlet as Foreign key
   outlet      Outlet        @relation(fields: [outletId], references: [id])

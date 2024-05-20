@@ -79,7 +79,7 @@ CREATE TABLE "TransactionProduct" (
 CREATE TABLE "Invoice" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "paid" BOOLEAN NOT NULL DEFAULT false,
+    "invoiceGrandTotalPrice" DOUBLE PRECISION NOT NULL,
     "outletId" INTEGER NOT NULL,
 
     CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
