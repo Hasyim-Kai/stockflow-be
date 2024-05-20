@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Section =========================================================================
+// 1 Outlet can have many User (1 to many)
+
+enum Role {
+  ADMIN
+  OUTLET_OWNER
+  EMPLOYEE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique
+  password  String   @db.VarChar(100)
+  role      Role
+  createdAt DateTime @default(now())
+
+  // one to one with outlet
+  outlet       Outlet        @relation(fields: [outletId], references: [id])
+  outletId     Int
+  // one to many with transaction
+  transactions Transaction[]
+}
+
+model Outlet {
+  id      Int    @id @default(autoincrement())
+  name    String @db.VarChar(100)
+  address String
+
+  // one to many with user
+  user        User[]
+  // one to many with Product
+  product     Product[]
+  // one to many with Transaction
+  transaction Transaction[]
+  // one to many with Invoice
+  invoice     Invoice[]
+}
+
+// Product Section =========================================================================
+
+enum QuantityUnit {
+  Pcs
+  Liter
+  MiliLiter
+  Box
+  Cup
+  Bottle
+}
+
+model Product {
+  id             Int          @id @default(autoincrement())
+  productCode    String
+  name           String
+  price          Float
+  sealedQuantity Int          @default(0)
+  openedQuantity Int          @default(0)
+  quantityUnit   QuantityUnit @default(Bottle)
+  description    String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+
+  // many to many with transaction through 'TransactionProduct'
+  transactionProducts TransactionProduct[]
+  // one to many with Outlet as Foreign key
+  outlet              Outlet               @relation(fields: [outletId], references: [id])
+  outletId            Int
+}
+
+enum TransactionType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+enum YesNoType {
+  YES
+  NO
+}
+
+model Transaction {
+  id         Int             @id @default(autoincrement())
+  totalPrice Float
+  type       TransactionType @default(IN)
+  isInvoiced YesNoType       @default(NO)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @default(now()) @updatedAt
+
+  // one to many with user
+  userId              Int
+  user                User                 @relation(fields: [userId], references: [id])
+  // many to many with transaction through 'TransactionProduct'
+  transactionProducts TransactionProduct[]
+  // one to many with Outlet as Foreign key
+  outletId            Int
+  outlet              Outlet               @relation(fields: [outletId], references: [id])
+  // one to many with Invoice as foreign key
+  invoice             Invoice?             @relation(fields: [invoiceId], references: [id])
+  invoiceId           Int?
+}
+
+// THIS TABLE IS THE MID TABLE BETWEEN TRANSACTION & PRODUCT MANY-TO-MANY RELATION
+model TransactionProduct {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  sumPrice Float
+
+  // Foreign key relationships
+  transactionId Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  productId     Int
+  product       Product     @relation(fields: [productId], references: [id])
+
+  // Unique constraint to prevent duplicate entries per transaction-product combination
+  @@unique([transactionId, productId])
+}
+
+model Invoice {
+  id                     Int      @id @default(autoincrement())
+  createdAt              DateTime @default(now())
+  invoiceGrandTotalPrice Float
+
+  // one to many with Outlet as Foreign key
+  outlet      Outlet        @relation(fields: [outletId], references: [id])
+  outletId    Int
+  // one to many with Transaction
+  transaction Transaction[]
+}
