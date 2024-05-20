@@ -4,6 +4,8 @@ import { Outlet, Product, Transaction } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { CreateUpdateProductTransactionDto } from './dto/create-update-product-transaction.dto';
 import { JwtPayloadType } from '@/auth/dto/jwt-payload';
+import { OutletWithNoTransactionsPastThreeDaysDto } from './dto/return-type';
+import { formatDate } from '@/utils/helper/date';
 
 @Injectable()
 export class ProductTransactionService {
@@ -126,7 +128,7 @@ export class ProductTransactionService {
     }
   }
 
-  async getAllOutletWithNoTransactionsPastThreeDays() {
+  async getAllOutletWithNoTransactionsPastThreeDays(): Promise<OutletWithNoTransactionsPastThreeDaysDto[]> {
     try {
       let allOutletWithTransactionsPastThreeDays, outletWithNoTransactionsPastThreeDays;
       const threeDaysAgo = new Date();
@@ -154,12 +156,25 @@ export class ProductTransactionService {
         })
       })
 
-      const message = `${outletWithNoTransactionsPastThreeDays.map((outlet, index: number) => `${index === 0 ? '' : ' '}${outlet.name} (${outlet.address})`)}`
-      return {
-        headline: `Outlet With No Transactions`,
-        message,
-        source: `Konsinyasi Distributor App`
-      };
+      return outletWithNoTransactionsPastThreeDays
+    } catch (error) {
+      // Handle potential Prisma errors here (e.g., record not found)
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') { // Record not found
+          throw new NotFoundException('Record not found');
+        } else {
+          throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      }
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  generateTextAlertForOutletWithNoTransactionsPastThreeDays(dataInput: OutletWithNoTransactionsPastThreeDaysDto[]) {
+    try {
+      const outlets = `${dataInput.map((outlet) => `- ${outlet.name} (${outlet.address}) \n`)}`
+      return `Outlet With No Transactions\nFrom Konsinyasi Distributor App
+      \n${outlets} \nThankyou & Have a nice day!`
     } catch (error) {
       // Handle potential Prisma errors here (e.g., record not found)
       if (error instanceof PrismaClientKnownRequestError) {
