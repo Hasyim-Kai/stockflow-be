@@ -50,6 +50,8 @@ model Outlet {
   transaction Transaction[]
   // one to many with Invoice
   invoice     Invoice[]
+  // one to many with Cctv
+  cctv        Cctv[]
 }
 
 // Product Section =========================================================================
@@ -140,4 +142,15 @@ model Invoice {
   outletId    Int
   // one to many with Transaction
   transaction Transaction[]
+}
+
+model Cctv {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name      String   @db.VarChar(100)
+  link      String
+
+  // one to many with Outlet as Foreign key
+  outlet   Outlet @relation(fields: [outletId], references: [id])
+  outletId Int
 }
