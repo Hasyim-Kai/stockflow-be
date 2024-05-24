@@ -2,8 +2,8 @@ import { PrismaService } from '@/services/prisma/prisma.service';
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Cctv } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { CreateUpdateSecurityCctvDto } from './dto/create-update-product.dto';
 import { JwtPayloadType } from '@/auth/dto/jwt-payload';
+import { CreateUpdateSecurityCctvDto } from './dto/create-update-cctv.dto';
 
 @Injectable()
 export class SecurityCctvService {
@@ -13,13 +13,13 @@ export class SecurityCctvService {
 
   async create(dto: CreateUpdateSecurityCctvDto, user: JwtPayloadType): Promise<Cctv> {
     try {
-      const product = await this.prisma.product.create({
+      const cctv = await this.prisma.cctv.create({
         data: {
           ...dto,
           outletId: user.outletId
         },
       });
-      return product;
+      return cctv;
     } catch (error) {
       // Handle Prisma-specific errors (e.g., unique constraint violations)
       if (error instanceof PrismaClientKnownRequestError) {
@@ -36,12 +36,12 @@ export class SecurityCctvService {
 
   async findAll(user: JwtPayloadType): Promise<Cctv[]> {
     try {
-      const products = await this.prisma.product.findMany({
+      const cctvs = await this.prisma.cctv.findMany({
         where: {
           outletId: user.outletId
         }
       });
-      return products;
+      return cctvs;
     } catch (error) {
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -49,11 +49,11 @@ export class SecurityCctvService {
 
   async findOne(id: number): Promise<Cctv | null> {
     try {
-      const product = await this.prisma.product.findUnique({
+      const cctv = await this.prisma.cctv.findUnique({
         where: { id },
       });
 
-      return product;
+      return cctv;
     } catch (error) {
       // Handle potential Prisma errors here (e.g., record not found)
       if (error instanceof PrismaClientKnownRequestError) {
@@ -70,11 +70,11 @@ export class SecurityCctvService {
   async update(id: number, updateSecurityCctvDto: CreateUpdateSecurityCctvDto, currentUser: JwtPayloadType): Promise<Cctv> {
     try {
       updateSecurityCctvDto.outletId = currentUser.outletId
-      const product = await this.prisma.product.update({
+      const cctv = await this.prisma.cctv.update({
         where: { id },
         data: updateSecurityCctvDto,
       });
-      return product;
+      return cctv;
     } catch (error) {
       // Handle Prisma-specific errors (similar to create)
       if (error instanceof PrismaClientKnownRequestError) {
@@ -90,7 +90,7 @@ export class SecurityCctvService {
 
   async remove(id: number): Promise<void> {
     try {
-      await this.prisma.product.delete({ where: { id } });
+      await this.prisma.cctv.delete({ where: { id } });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') { // Unique constraint violation

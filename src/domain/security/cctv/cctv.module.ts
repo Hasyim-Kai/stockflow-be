@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SecurityCctvService } from './cctv.service';
-import { SecurityCctvController } from './product.controller';
+import { SecurityCctvController } from './cctv.controller';
 
 @Module({
   controllers: [SecurityCctvController],
