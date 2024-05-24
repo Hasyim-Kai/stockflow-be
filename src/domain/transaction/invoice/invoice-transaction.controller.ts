@@ -15,6 +15,11 @@ export class InvoiceTransactionController {
     return this.invoiceTransactionService.findAll(user);
   }
 
+  @Post(`experimental`)
+  create() {
+    return this.invoiceTransactionService.generateInvoiceForAllNotInvoicedTransactions();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.invoiceTransactionService.findOne(+id);
