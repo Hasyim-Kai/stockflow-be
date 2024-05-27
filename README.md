@@ -1,3 +1,56 @@
+# Konsinyasi Documentation
+This project use Node 16 and NPM 8.19.4 version
+
+#### How to Init the DB
+``` bash
+$ docker compose up --name init
+```
+#### If not automatically seeded, run this code
+``` bash
+$ npx db prisma seed 
+```
+#### How to Init the Project
+``` bash
+$ yarn
+```
+#### How to start the Project
+``` bash
+Run the DB container in Docker Desktop first, then run this code
+$ yarn start:dev
+```
+#### How to build
+``` bash
+$ yarn build
+```
+#### How to serve the build file
+``` bash
+Run the DB container in Docker Desktop first, then run this code
+$ yarn start:prod
+```
+
+
+#### Project Folder Structure
+```
+BE Nest js Konsinyasi
+├── prisma/                 # contain db schema & db seed file
+└── src/
+    ├── auth/               # for handling authentication (sign in) & JWT
+    ├── config/             # contain configuration for the services
+    ├── decorator/          # contain custom nest js decorator for 
+    │                       handling custom business logic, 
+    │                       currently here we have @CurrentUser 
+    │                       for getting the current user requesting current request
+    ├── domain/             # contain all domain for the application (main element in this app)
+    ├── services/           # contain 3rd party service 
+    │                       like cronjob, prisma initiation and Whatsapp service
+    └── utils/              # contain helper function to ease diplaying & processing data
+```
+
+
+<br>
+<br>
+<br>
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
