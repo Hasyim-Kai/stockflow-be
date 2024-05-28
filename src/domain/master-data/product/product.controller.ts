@@ -4,6 +4,7 @@ import { CreateUpdateProductDto } from './dto/create-update-product.dto';
 import { AuthGuard } from '@/auth/auth.guard';
 import { JwtPayloadType } from '@/auth/dto/jwt-payload';
 import { CurrentUser } from '@/decorator/current-user';
+import { CreateUpdateProductManyDto } from './dto/create-update-product-many.dto';
 
 @UseGuards(AuthGuard)
 @Controller('product')
@@ -13,6 +14,11 @@ export class ProductController {
   @Post()
   create(@Body() dto: CreateUpdateProductDto, @CurrentUser() user: JwtPayloadType) {
     return this.productService.create(dto, user);
+  }
+
+  @Post(`many`)
+  createMany(@Body() dto: CreateUpdateProductManyDto, @CurrentUser() user: JwtPayloadType) {
+    return this.productService.createMany(dto, user);
   }
 
   @Get()

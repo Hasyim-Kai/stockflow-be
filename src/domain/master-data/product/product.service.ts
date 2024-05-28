@@ -4,6 +4,7 @@ import { Product } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { CreateUpdateProductDto } from './dto/create-update-product.dto';
 import { JwtPayloadType } from '@/auth/dto/jwt-payload';
+import { CreateUpdateProductManyDto } from './dto/create-update-product-many.dto';
 
 @Injectable()
 export class ProductService {
@@ -20,6 +21,25 @@ export class ProductService {
         },
       });
       return product;
+    } catch (error) {
+      // Handle Prisma-specific errors (e.g., unique constraint violations)
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') { // Unique constraint violation
+          throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+        } else {
+          throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      }
+      // Handle other unexpected errors
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async createMany(dto: CreateUpdateProductManyDto, user: JwtPayloadType): Promise<void> {
+    try {
+      await this.prisma.product.createMany({
+        data: dto.products,
+      });
     } catch (error) {
       // Handle Prisma-specific errors (e.g., unique constraint violations)
       if (error instanceof PrismaClientKnownRequestError) {
