@@ -47,6 +47,26 @@ export class ProductService {
     }
   }
 
+  async findTop5(user: JwtPayloadType): Promise<{ id: number, name: string, openedQuantity: number }[]> {
+    try {
+      const products = await this.prisma.product.findMany({
+        where: {
+          outletId: user.outletId
+        },
+        orderBy: {
+          openedQuantity: 'desc'
+        },
+        take: 5,
+        select: {
+          id: true, name: true, openedQuantity: true
+        },
+      });
+      return products;
+    } catch (error) {
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async findOne(id: number): Promise<Product | null> {
     try {
       const product = await this.prisma.product.findUnique({

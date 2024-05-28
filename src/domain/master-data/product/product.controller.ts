@@ -20,6 +20,11 @@ export class ProductController {
     return this.productService.findAll(user);
   }
 
+  @Get(`top-5`)
+  findTop5(@CurrentUser() user: JwtPayloadType) {
+    return this.productService.findTop5(user);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: string) {
     return this.productService.findOne(+id);
