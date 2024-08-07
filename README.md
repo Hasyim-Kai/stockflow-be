@@ -1,51 +1,69 @@
-# Konsinyasi Documentation
+# Stockflow Documentation
+
 This project use Node 16 and NPM 8.19.4 version
 
 #### How to Init the DB
-``` bash
+
+```bash
 $ docker compose up --name init
 ```
-#### If not automatically seeded, run this code
-``` bash
-$ npx db prisma seed 
+
+#### How to Init the DB (for local Postgresql)
+
+```bash
+$ npx prisma migrate dev --name init
 ```
+
+#### If not automatically seeded, run this code
+
+```bash
+$ npx db prisma seed
+```
+
 #### How to Init the Project
-``` bash
+
+```bash
 $ yarn
 ```
+
 #### How to start the Project
-``` bash
-Run the DB container in Docker Desktop first, then run this code
+
+```bash
+if using Docker Postgresql, Run the DB container in Docker Desktop first, then run this code
+if using local Postgresql, run this code without run the docker
 $ yarn start:dev
 ```
+
 #### How to build
-``` bash
+
+```bash
 $ yarn build
 ```
+
 #### How to serve the build file
-``` bash
+
+```bash
 Run the DB container in Docker Desktop first, then run this code
 $ yarn start:prod
 ```
 
-
 #### Project Folder Structure
+
 ```
-BE Nest js Konsinyasi
+BE Nest js Stockflow
 ├── prisma/                 # contain db schema & db seed file
 └── src/
     ├── auth/               # for handling authentication (sign in) & JWT
     ├── config/             # contain configuration for the services
-    ├── decorator/          # contain custom nest js decorator for 
-    │                       handling custom business logic, 
-    │                       currently here we have @CurrentUser 
+    ├── decorator/          # contain custom nest js decorator for
+    │                       handling custom business logic,
+    │                       currently here we have @CurrentUser
     │                       for getting the current user requesting current request
     ├── domain/             # contain all domain for the application (main element in this app)
-    ├── services/           # contain 3rd party service 
+    ├── services/           # contain 3rd party service
     │                       like cronjob, prisma initiation and Whatsapp service
     └── utils/              # contain helper function to ease diplaying & processing data
 ```
-
 
 <br>
 <br>
